@@ -30,7 +30,7 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 // IPAddress ip(10, 195, 57, 93); // The IP address will be dependent on your local network:
-IPAddress ip(192, 168, 11, 250); // The IP address will be dependent on your local network:
+IPAddress ip(192, 168, 11, 251); // The IP address will be dependent on your local network:
 IPAddress myDns(192, 168, 11, 1);
 IPAddress gateway(192, 168, 11, 1);
 IPAddress subnet(255, 255, 255, 0);

@@ -137,7 +137,14 @@ void sendWiegand(int numberValue)
   // Wait for a while before transmitting another code
   mySerial.println("send");
   mySerial.println("--------------");
-  digitalWrite(LED_DATA, HIGH);
-  delay(100);
-  digitalWrite(LED_DATA, LOW);
+//   digitalWrite(LED_DATA, HIGH);
+//   delay(100);
+//   digitalWrite(LED_DATA, LOW);
+  for(int i=0; i<3; i++)
+  {
+    digitalWrite(LED_LAN, HIGH);
+    delay(100);
+    digitalWrite(LED_LAN, LOW);
+    delay(300);
+  }
 }
