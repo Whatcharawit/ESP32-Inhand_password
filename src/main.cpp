@@ -60,6 +60,7 @@ void Ethernet_chenk()
   // Check for Ethernet hardware present
   if (Ethernet.hardwareStatus() == EthernetNoHardware) 
   {
+    eth_state = 0;
     mySerial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
     while (true) 
     {
@@ -73,6 +74,7 @@ void Ethernet_chenk()
 
   if (Ethernet.linkStatus() == LinkOFF) 
   {
+    eth_state = 0;
     mySerial.println("Ethernet cable is not connected.");
     for(int i=0; i<5; i++)
     {
@@ -85,7 +87,11 @@ void Ethernet_chenk()
   digitalWrite(LED_LAN, HIGH);
 
   mySerial.println(Ethernet.localIP());
-  server.begin();
+  if(eth_state == 0)
+  {
+    server.begin();
+    eth_state = 1;
+  }
 }
 
 void sendWiegand(int numberValue)
@@ -142,9 +148,9 @@ void sendWiegand(int numberValue)
 //   digitalWrite(LED_DATA, LOW);
   for(int i=0; i<3; i++)
   {
-    digitalWrite(LED_LAN, HIGH);
+    digitalWrite(LED_DATA, HIGH);
     delay(100);
-    digitalWrite(LED_LAN, LOW);
+    digitalWrite(LED_DATA, LOW);
     delay(300);
   }
 }

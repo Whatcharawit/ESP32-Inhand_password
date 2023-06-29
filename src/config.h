@@ -13,6 +13,8 @@
 #define D1_PIN PA2
 #define WIEGAND_DELAY_MICROSECONDS 20
 
+int eth_state;
+
 const int WIEGAND_TOTAL_BITS = 35;
 const int WIEGAND_OFFSET_BITS = 14;
 const int WIEGAND_RANGE_BITS = 20;
@@ -27,12 +29,12 @@ int bit_data[35];
 
 // Enter a MAC address and IP address for your controller below.
 byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEE
 };
 // IPAddress ip(10, 195, 57, 93); // The IP address will be dependent on your local network:
-IPAddress ip(192, 168, 11, 251); // The IP address will be dependent on your local network:
-IPAddress myDns(192, 168, 11, 1);
-IPAddress gateway(192, 168, 11, 1);
+IPAddress ip(10, 195, 57, 94); // The IP address will be dependent on your local network:
+IPAddress myDns(10, 195, 57, 1);
+IPAddress gateway(10, 195, 57, 1);
 IPAddress subnet(255, 255, 255, 0);
 
 void Ethernet_chenk();
