@@ -6,25 +6,34 @@ HardwareSerial mySerial(USART1);
 String recieved_number = "";
 int client_id;
 
+unsigned long last_module = 0;
+unsigned long last_lan = 0;
+
 void setup() 
 {
   mySerial.begin(115200);
-  mySerial.println("Hello STM32");
   delay(100);
 
   pinMode(LED_LAN, OUTPUT);
   pinMode(LED_DATA, OUTPUT);
   pinMode(D0_PIN, OUTPUT);
   pinMode(D1_PIN, OUTPUT);
-  digitalWrite(LED_LAN, LOW);
+  digitalWrite(LED_LAN, HIGH);
   digitalWrite(LED_DATA, LOW);
   delay(1000);
+  mySerial.println("Hello STM32");
 
+  // Initialize the watchdog timer
+  IWDG->KR = 0x5555;  // Enable access to the IWDG_PR and IWDG_RLR registers
+  IWDG->PR = 4;      // Set the prescaler to achieve a 4-second timeout (256 prescaler)
+  IWDG->RLR = 0xFFF;  // Set the reload value for a 4-second timeout
+  IWDG->KR = 0xAAAA;  // Reload the watchdog timer
+  IWDG->KR = 0xCCCC;  // Start the watchdog timer
 
   Ethernet.init(PA4); // Ethernet CS pin
   //-------------------- Connect to Ethernet --------------------//
   // initialize the Ethernet device
-  Ethernet.begin(mac, ip);
+  Ethernet.begin(mac, ip, gateway, subnet);
   Ethernet_chenk();
 
   //------------------ End Connect to Ethernet ------------------//
@@ -38,6 +47,10 @@ void setup()
 void loop() 
 {
   Ethernet_chenk();
+
+  // Reset the watchdog timer to prevent a reset
+  IWDG->KR = 0xAAAA;  // Reload the watchdog timer
+
   EthernetClient client = server.available();
   if (client) {
     while (client.connected()) {
@@ -57,39 +70,44 @@ void loop()
 
 void Ethernet_chenk()
 {
+  last_lan = millis();
   // Check for Ethernet hardware present
-  if (Ethernet.hardwareStatus() == EthernetNoHardware) 
+  while (Ethernet.hardwareStatus() == EthernetNoHardware) 
   {
+    if(millis() - last_lan >= 10000)
+    {
+      delay(2500);
+    }
     eth_state = 0;
     mySerial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
-    while (true) 
-    {
+    // for(int i=0; i<12; i++)
+    // {
       digitalWrite(LED_LAN, HIGH);
       delay(100);
       digitalWrite(LED_LAN, LOW);
       delay(100);
       // delay(1); // do nothing, no point running without Ethernet hardware
-    }
+    // }
   }
 
-  if (Ethernet.linkStatus() == LinkOFF) 
+  while (Ethernet.linkStatus() == LinkOFF) 
   {
     eth_state = 0;
     mySerial.println("Ethernet cable is not connected.");
-    for(int i=0; i<5; i++)
-    {
+    // for(int i=0; i<10; i++)
+    // {
       digitalWrite(LED_LAN, HIGH);
       delay(50);
       digitalWrite(LED_LAN, LOW);
       delay(300);
-    }
+    // }
   }
   digitalWrite(LED_LAN, HIGH);
 
-  mySerial.println(Ethernet.localIP());
   if(eth_state == 0)
   {
     server.begin();
+    mySerial.println(Ethernet.localIP());
     eth_state = 1;
   }
 }
