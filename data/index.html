@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32 Web Server</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1>ESP32 Web Server</h1>
+    <p>Enter Username and Password:</p>
+    <button onclick="updateStatus()">Refresh Status</button>
+    
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="sendLogin()">Submit</button>
+
+    <script>
+        function sendLogin() {
+            let user = document.getElementById("username").value;
+            let pass = document.getElementById("password").value;
+            
+            // Send username and password to ESP32
+            fetch(`/login?user=${user}&pass=${pass}`)
+                .then(response => response.text())
+                .then(data => console.log("Response from ESP32:", data));
+        }
+
+        function updateStatus() {
+            fetch("/status")
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("statusText").innerText = data;
+                    if (data.trim() === "ON") {
+                        window.location.href = "/on.html"; // Redirect to ON page
+                    }
+                })
+                .catch(error => console.error("Error fetching status:", error));
+        }
+
+        // Auto-refresh status every 5 seconds
+        setInterval(updateStatus, 5000);
+    </script>
+
+    <h1>ESP32 Web Server</h1>
+    <p>Device Status: <span id="statusText">Loading...</span></p>
+</body>
+</html>
